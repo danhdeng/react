@@ -47,7 +47,7 @@ function App() {
   const client=new GraphQLClient("https://api.github.com/graphql",
   {
     headers:{
-      Authorization: `Bearer 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`
+      Authorization: `Bearer <Access Token>`
     }
   });
 
