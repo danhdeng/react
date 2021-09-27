@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# create a tailwindcss configuration
+
+npx tailwindcss init
+
 ## Available Scripts
 
 In the project directory, you can run:
