@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
-import { useGlobalFilter, useSortBy, useTable } from "react-table";
+import { useTable } from "react-table";
 import tw from "twin.macro";
 
 
@@ -51,6 +51,7 @@ export default function Products() {
     const [products, setProducts] = useState([]);
 
     const fetchProducts = async () => {
+        console.log("start to load product");
         const response = await axios
             .get("https://fakestoreapi.com/products")
             .catch((err) => console.log(err));
@@ -108,6 +109,8 @@ export default function Products() {
         []
     );
 
+    
+
     const columns = useMemo(
         () => [
             {
@@ -126,25 +129,25 @@ export default function Products() {
         []
     );
 
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-    } = useTable({
-        columns,
-        data,
-    })
+    // const {
+    //     getTableProps,
+    //     getTableBodyProps,
+    //     headerGroups,
+    //     rows,
+    //     prepareRow,
+    // } = useTable({
+    //     columns,
+    //     data,
+    // })
 
-    const productData = useMemo(() => [...products], [products]);
+    const productsData = useMemo(() => [...products], [products]);
 
-    const productColumn = useMemo(
+    const productsColumns = useMemo(
         () => products[0]
             ? Object.keys(products[0])
-                .filter((key) => key != "rating")
+                .filter((key) => key !== "rating")
                 .map((key) => {
-                    if (key == "image")
+                    if (key === "image")
                         return {
                             Header: key,
                             accessor: key,
@@ -155,6 +158,23 @@ export default function Products() {
                 }) : [],
         [products]
     );
+
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        rows,
+        prepareRow,
+    } = useTable(
+        {
+            columns: productsColumns,
+            data: productsData,
+          }
+    );
+
+    useEffect(() => {
+        fetchProducts();
+      }, []);
 
     // Render the UI for your table
     return (
