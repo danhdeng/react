@@ -1,8 +1,7 @@
-import logo from "./logo.svg";
-import "./App.css";
-
 import tw from "twin.macro";
+import "./App.css";
 import Products from "./components/products";
+
 
 const AppContainer = tw.div`
   w-full

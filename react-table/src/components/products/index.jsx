@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
-import { useTable } from "react-table";
+import { useGlobalFilter, useSortBy, useTable } from "react-table";
 import tw from "twin.macro";
+import GlobalFilter from "./globalFilter";
 
 
 const Table = tw.table`
@@ -159,18 +160,63 @@ export default function Products() {
         [products]
     );
 
-    const {
+    const tableHooks=(hooks)=>{
+        hooks.visibleColumns.push((columns)=>[
+            ...columns,
+            {
+                id: "Edit",
+                Header: "Edit",
+                Cell:({row})=>(
+                    <Button onClick={()=>alert("Editing:"+ row.values.price)}>
+                        Edit
+                    </Button>
+                ),
+            }
+        ])
+    }
+
+    // const {
+    //     getTableProps,
+    //     getTableBodyProps,
+    //     headerGroups,
+    //     rows,
+    //     prepareRow,
+    //     preGlobalFilteredRows,
+    //     setGlobalFilter,
+    //     state,
+    // } = useTable(
+    //     {
+    //         columns: productsColumns,
+    //         data: productsData,
+    //     },
+    //     useGlobalFilter,
+    //     tableHooks,
+    //     useSortBy
+    // );
+
+    const tableInstance = useTable(
+        {
+          columns: productsColumns,
+          data: productsData,
+        },
+        useGlobalFilter,
+        tableHooks,
+        useSortBy
+      );
+    
+      const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         rows,
         prepareRow,
-    } = useTable(
-        {
-            columns: productsColumns,
-            data: productsData,
-          }
-    );
+        preGlobalFilteredRows,
+        setGlobalFilter,
+        state,
+      } = tableInstance;
+
+      
+    const isEvent=(idx)=> idx%2===0;
 
     useEffect(() => {
         fetchProducts();
@@ -178,21 +224,30 @@ export default function Products() {
 
     // Render the UI for your table
     return (
+        <>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          setGlobalFilter={setGlobalFilter}
+          globalFilter={state.globalFilter}
+        />
         <Table {...getTableProps()}>
             <TableHead>
                 {headerGroups.map(headerGroup => (
                     <TableRow {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
-                            <TableHeader {...column.getHeaderProps()}>{column.render('Header')}</TableHeader>
+                            <TableHeader {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                {column.render('Header')}
+                                {column.isSorted ? (column.isSortedDesc ? " ▼" : " ▲") : ""}
+                            </TableHeader>
                         ))}
                     </TableRow>
                 ))}
             </TableHead>
             <TableBody {...getTableBodyProps()}>
-                {rows.map((row, i) => {
+                {rows.map((row, idx) => {
                     prepareRow(row)
                     return (
-                        <TableRow {...row.getRowProps()}>
+                        <TableRow {...row.getRowProps()} className={isEvent(idx)? 'bg-green-400 bg-opacity-30' :''} >
                             {row.cells.map(cell => {
                                 return <TableData {...cell.getCellProps()}>{cell.render('Cell')}</TableData>
                             })}
@@ -201,5 +256,6 @@ export default function Products() {
                 })}
             </TableBody>
         </Table>
+    </>
     )
 }
